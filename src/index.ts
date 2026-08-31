@@ -1,14 +1,47 @@
-import express from "express";
+import { eq } from "drizzle-orm";
+import { db } from "./db/index";
+import { departments } from "./db/schema/index";
 
-const app = express();
-const port = 8000;
+async function main() {
+	try {
+		console.log("Performing CRUD operations...");
 
-app.use(express.json());
+		const [newUser] = await db
+			.insert(departments)
+			.values({ name: "Computer Science", code: "CS" })
+			.returning();
 
-app.get("/", (_request, response) => {
-	response.send("Class Connect API is running");
-});
+		if (!newUser) {
+			throw new Error("Failed to create user");
+		}
 
-app.listen(port, () => {
-	console.log(`Server running at http://localhost:${port}`);
-});
+		console.log("CREATE: New user created:", newUser);
+
+		const [foundUser] = await db
+			.select()
+			.from(departments)
+			.where(eq(departments.id, newUser.id));
+		console.log("READ: Found user:", foundUser);
+
+		const [updatedUser] = await db
+			.update(departments)
+			.set({ name: "Software Engineering" })
+			.where(eq(departments.id, newUser.id))
+			.returning();
+
+		if (!updatedUser) {
+			throw new Error("Failed to update user");
+		}
+
+		console.log("UPDATE: User updated:", updatedUser);
+
+		await db.delete(departments).where(eq(departments.id, newUser.id));
+		console.log("DELETE: User deleted.");
+		console.log("CRUD operations completed successfully.");
+	} catch (error) {
+		console.error("Error performing CRUD operations:", error);
+		process.exitCode = 1;
+	}
+}
+
+void main();
