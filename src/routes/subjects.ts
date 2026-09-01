@@ -13,7 +13,6 @@ router.get("/", async (req,res) => {
         const limitPage = Math.min(1,parseInt(String(limit),10) || 100)
 
         const offset = (currentPage-1) * limitPage
-
         const filterConditions = []
 
         if(search){
