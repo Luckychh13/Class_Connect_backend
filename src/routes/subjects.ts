@@ -9,11 +9,10 @@ router.get("/", async (req,res) => {
     try {
         const {search,department,page=1,limit=10} = req.query
 
-        const currentPage = Math.max(1,+page)
-        const limitPage = Math.max(1,+limit)
+        const currentPage = Math.max(1,parseInt(String(page),10) || 1)
+        const limitPage = Math.min(1,parseInt(String(limit),10) || 100)
 
         const offset = (currentPage-1) * limitPage
-
         const filterConditions = []
 
         if(search){
@@ -26,8 +25,9 @@ router.get("/", async (req,res) => {
         }
 
         if(department){
+            const deptPattern = `%${String(department).replace(/[%_]/g, '\\%&')}%`
             filterConditions.push(
-                ilike(departments.name, `%${department}%`)
+                ilike(departments.name, deptPattern)
             )
         }
 
