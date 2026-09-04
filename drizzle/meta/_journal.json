@@ -8,6 +8,13 @@
       "when": 1788193106826,
       "tag": "0000_bitter_dreadnoughts",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788505119804,
+      "tag": "0001_daily_chimera",
+      "breakpoints": true
     }
   ]
 }
