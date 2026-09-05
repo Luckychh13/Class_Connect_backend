@@ -4,10 +4,16 @@ if(!process.env.ARCJET_KEY && process.env.NODE_ENV !== 'test'){
     throw new Error('ARCJET_KEY anv is required')
 }
 
+const trustedProxies = (process.env.TRUSTED_PROXY_PROXIES ?? '')
+  .split(',')
+  .map((proxy) => proxy.trim())
+  .filter(Boolean)
+
 const aj = arcjet({
   // Get your site key from https://console.arcjet.com and set it as an environment
   // variable rather than hard coding.
   key: process.env.ARCJET_KEY!,
+  proxies: trustedProxies,
   rules: [
     // Shield protects your app from common attacks such as SQL injection
     shield({ mode: "LIVE" }),

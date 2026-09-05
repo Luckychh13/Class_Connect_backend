@@ -1,6 +1,7 @@
 import type {Request ,NextFunction, Response } from "express";
 import aj from "../config/arcjet"
 import { slidingWindow, ArcjetNodeRequest } from "@arcjet/node";
+import { isSpoofedBot } from "@arcjet/inspect";
 
 /**
  * - Security Middleware
@@ -47,6 +48,9 @@ const securityMiddleware = async (req:Request, res:Response, next:NextFunction) 
 
             const decision = await client.protect(arcjetRequest)
 
+            if(decision.results.some(isSpoofedBot)){
+                return res.status(403).json({error:"Forbidden", message:"Automated requests are not allowed"})
+            }
             if(decision.isDenied() && decision.reason.isBot()){
                 return res.status(403).json({error:"Forbidden", message:"Automated requests are not allowed"})
             } 
@@ -54,7 +58,7 @@ const securityMiddleware = async (req:Request, res:Response, next:NextFunction) 
                 return res.status(403).json({error:"Forbidden", message:"Request blocked by security policy"})
             } 
             if(decision.isDenied() && decision.reason.isRateLimit()){
-                return res.status(403).json({error:"Too many erequest", message})
+                return res.status(429).json({error:"Too many erequest", message})
             }
             
             next()
