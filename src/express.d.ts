@@ -4,6 +4,7 @@ declare global {
             user?: {
                 role?:"admin" | "teacher" | "student"
             }
+            userId?: string
         }
     }
 }

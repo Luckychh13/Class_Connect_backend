@@ -17,12 +17,12 @@ const securityMiddleware = async (req:Request, res:Response, next:NextFunction) 
 
             switch(role) {
                 case "admin":
-                    limit=20
+                    limit=50
                     message="Admin request limit exceeded (20 per minute). Slow down"
                     break
                 case "teacher":
                 case "student":
-                    limit=10
+                    limit=50
                     message="User request limit exceeded (10 per minute). Please wait"
                     break;
                 default:

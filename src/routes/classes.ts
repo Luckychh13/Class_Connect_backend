@@ -3,10 +3,11 @@ import { db } from "../db/index.js";
 import { classes, departments, subjects } from "../db/schema/app.js";
 import { and, desc, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
 import { user } from "../db/schema/auth.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
 
 const router = express.Router()
 
-router.post('/', async(req,res) => {
+router.post('/', requireAuth, requireRole(['teacher', 'admin']), async(req,res) => {
      try {
         const [createdClass] = await db
             .insert(classes)

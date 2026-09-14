@@ -7,7 +7,7 @@
     /* Node ESM */
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
 
     /* Project structure */
     "rootDir": "src",

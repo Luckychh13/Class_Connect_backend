@@ -2,6 +2,7 @@ import { and, count, desc, eq, getTableColumns, ilike, or, sql } from "drizzle-o
 import express from "express"
 import { departments, subjects } from "../db/schema/app.js"
 import { db } from "../db/index.js"
+import { requireAuth, requireRole } from "../middleware/auth.js"
 
 const router = express.Router()
 
@@ -63,6 +64,38 @@ router.get("/", async (req,res) => {
     } catch (e) {
         console.error(`Get /subjects error: ${e}`)
         res.status(500).json({error:'Failed to get subjects'})
+    }
+})
+
+router.post('/', requireAuth, requireRole(['admin']), async (req, res) => {
+    try {
+        const { name, code, description, department } = req.body;
+
+        const [dept] = await db
+            .select({ id: departments.id })
+            .from(departments)
+            .where(eq(departments.name, department));
+
+        if (!dept) {
+            return res.status(400).json({ error: "Invalid department", message: "The specified department does not exist." });
+        }
+
+        const [createdSubject] = await db
+            .insert(subjects)
+            .values({
+                name,
+                code,
+                description,
+                departmentId: dept.id,
+            })
+            .returning({ id: subjects.id });
+
+        if (!createdSubject) throw new Error("Insert failed");
+
+        res.status(201).json({ data: createdSubject });
+    } catch (e) {
+        console.error(`POST /subjects error: ${e}`);
+        res.status(500).json({ error: 'Failed to create subject' });
     }
 })
 
